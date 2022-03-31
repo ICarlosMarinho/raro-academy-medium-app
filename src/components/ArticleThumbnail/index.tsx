@@ -1,8 +1,10 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { formataData } from "../../helpers/date";
 import { ArticleThumbnailProps } from "./ArticleThumbnail.types";
 
 export const ArticleThumbnail: React.FC<ArticleThumbnailProps> = ({
+  id,
   imagem,
   titulo,
   resumo,
@@ -11,14 +13,20 @@ export const ArticleThumbnail: React.FC<ArticleThumbnailProps> = ({
   autor,
   editavel
 }) => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate(`/artigo/${id}`);
+  };
+
   return (
     <div className="flex flex-col w-2/3 mt-5">
-      <header className="flex flex-row gap-3 items-center">
+      <header className="flex flex-row gap-3 items-center hover:cursor-pointer" onClick={handleClick}>
         <img src={autor.avatar} className="rounded-full" style={{ width: "30px", height: "30px" }} />
         <div>{autor.nome}</div>
         <div className="text-sm text-gray-500">{formataData(dataPublicacao)}</div>
       </header>
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-4 gap-3 hover:cursor-pointer" onClick={handleClick}>
         <div className="col-span-3 flex flex-col">
           <div className="font-bold text-lg pt-3">{titulo}</div>
           <div className="font-light pt-2 text-base text-gray-600">{resumo}</div>
@@ -28,7 +36,9 @@ export const ArticleThumbnail: React.FC<ArticleThumbnailProps> = ({
         </div>
       </div>
       <footer className="flex flex-row pt-7 gap-3 items-center">
-        <div className="text-gray-500 text-xs my-1">{tempoLeitura} de leitura</div>
+        <div className="text-gray-500 text-xs my-1 hover:cursor-pointer" onClick={handleClick}>
+          {tempoLeitura} de leitura
+        </div>
         {editavel && (
           <button
             className={`
