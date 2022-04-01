@@ -1,5 +1,3 @@
-import React from "react";
-import logo from "./logo.svg";
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LoginPage } from "./pages/Login";
@@ -19,8 +17,8 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<ArtigosPage />} />
           <Route path="/artigo/:id" element={<ArtigoPage />} />
+          <Route path="artigo/edit/:id" element={<EditarArquivoPage />} />
           <Route path="/artigos" element={<MeusArtigosPage />} />
-          <Route path="/artigos/editar/:id" element={<EditarArquivoPage />} />
           <Route path="/artigos/novo" element={<EditarArquivoPage />} />
         </Route>
 
