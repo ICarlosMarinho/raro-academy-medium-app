@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios";
-import { getTokenDataFromStorage, parseArticle } from "../helpers";
+import { getBase64, getTokenDataFromStorage, parseArticle } from "../helpers";
 
 export const authenticate = (login: string, senha: string): Promise<TokenData> => {
   return axios
@@ -70,5 +70,33 @@ export const getArticle = (id: number) => {
     .then(({ data }) => parseArticle(data))
     .catch((_error: AxiosError) => {
       throw new Error("Erro ao buscar artigo, verifique sua conexão ou entre em contato com o administrador");
+    });
+};
+
+export const saveArticle = (titulo: string, imagem: string, resumo: string, conteudo: string) => {
+  const tokenData = getTokenDataFromStorage();
+  const headers = tokenData ? { Authorization: `Bearer ${tokenData.token}` } : undefined;
+  const data = {
+    titulo,
+    imagem,
+    resumo,
+    conteudo
+  };
+
+  return axios
+    .post(`${process.env.REACT_APP_API_URL}/artigos`, data, {
+      headers
+    })
+    .then(() => "Artigo salvo com sucesso")
+    .catch((error: AxiosError) => {
+      let message;
+
+      if (error.response?.status === 401) {
+        message = "Operação não permitida, faça login e tente novamente";
+      } else {
+        message = "Erro ao salvar artigo, verifique sua conexão ou entre em contato com o administrador";
+      }
+
+      throw new Error(message);
     });
 };
