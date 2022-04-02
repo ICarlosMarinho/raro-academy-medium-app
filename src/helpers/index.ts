@@ -18,3 +18,27 @@ export const parseArticle = (article: Article): Article => {
     }
   };
 };
+
+export const getTokenDataFromStorage = () => {
+  try {
+    const tokenDataString = localStorage.getItem("tokenData");
+
+    if (tokenDataString) {
+      return JSON.parse(tokenDataString) as TokenData;
+    }
+
+    return null;
+  } catch (_error) {
+    return null;
+  }
+};
+
+export const setTokenDataToStorage = (tokenData: TokenData) => {
+  try {
+    localStorage.setItem("tokenData", JSON.stringify(tokenData));
+
+    return true;
+  } catch (_error) {
+    return false;
+  }
+};
