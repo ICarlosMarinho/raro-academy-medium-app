@@ -1,5 +1,18 @@
 import axios, { AxiosError } from "axios";
-import { getBase64, getTokenDataFromStorage, parseArticle } from "../helpers";
+import { getTokenDataFromStorage, parseArticle } from "../helpers";
+
+export const messages = {
+  success: {
+    delete: "Artigo excluído com sucesso",
+    update: "Artigo atualizado com sucesso",
+    create: "Artigo criado com sucesso"
+  },
+  error: {
+    authentication: "Usuário ou senha inválidos",
+    system: "Um erro inesperado ocorreu, verifique sua conexão ou entre em contato com o suporte",
+    authorization: "Operação não permitida, faça login e tente novamente"
+  }
+};
 
 export const authenticate = (login: string, senha: string): Promise<TokenData> => {
   return axios
@@ -12,13 +25,7 @@ export const authenticate = (login: string, senha: string): Promise<TokenData> =
       token: data.access_token
     }))
     .catch((error: AxiosError) => {
-      let message;
-
-      if (error.response?.status === 401) {
-        message = "Usuário ou senha inválidos";
-      } else {
-        message = "Erro ao autenticar, verifique sua conexão ou entre em contato com o administrador";
-      }
+      let message = error.response?.status === 401 ? messages.error.authentication : messages.error.system;
 
       throw new Error(message);
     });
@@ -33,9 +40,7 @@ export const getArticles = (titulo = "") => {
     })
     .then(({ data }) => data.map((article) => parseArticle(article)))
     .catch((_error: AxiosError) => {
-      throw new Error(
-        "Erro ao buscar artigos, verifique sua conexão ou entre em contato com o administrador"
-      );
+      throw new Error(messages.error.system);
     });
 };
 
@@ -52,13 +57,7 @@ export const getMyArticles = (titulo = "") => {
     })
     .then(({ data }) => data.map((article) => parseArticle(article)))
     .catch((error: AxiosError) => {
-      let message;
-
-      if (error.response?.status === 401) {
-        message = "Operação não permitida, faça login e tente novamente";
-      } else {
-        message = "Erro ao autenticar, verifique sua conexão ou entre em contato com o administrador";
-      }
+      let message = error.response?.status === 401 ? messages.error.authorization : messages.error.system;
 
       throw new Error(message);
     });
@@ -69,11 +68,11 @@ export const getArticle = (id: number) => {
     .get<Article>(`${process.env.REACT_APP_API_URL}/artigos/${id}`)
     .then(({ data }) => parseArticle(data))
     .catch((_error: AxiosError) => {
-      throw new Error("Erro ao buscar artigo, verifique sua conexão ou entre em contato com o administrador");
+      throw new Error(messages.error.system);
     });
 };
 
-export const saveArticle = (titulo: string, imagem: string, resumo: string, conteudo: string) => {
+export const createArticle = (titulo: string, imagem: string, resumo: string, conteudo: string) => {
   const tokenData = getTokenDataFromStorage();
   const headers = tokenData ? { Authorization: `Bearer ${tokenData.token}` } : undefined;
   const data = {
@@ -87,15 +86,9 @@ export const saveArticle = (titulo: string, imagem: string, resumo: string, cont
     .post(`${process.env.REACT_APP_API_URL}/artigos`, data, {
       headers
     })
-    .then(() => "Artigo salvo com sucesso")
+    .then(() => messages.success.create)
     .catch((error: AxiosError) => {
-      let message;
-
-      if (error.response?.status === 401) {
-        message = "Operação não permitida, faça login e tente novamente";
-      } else {
-        message = "Erro ao salvar artigo, verifique sua conexão ou entre em contato com o administrador";
-      }
+      let message = error.response?.status === 401 ? messages.error.authorization : messages.error.system;
 
       throw new Error(message);
     });
@@ -121,15 +114,9 @@ export const updateArticle = (
     .patch(`${process.env.REACT_APP_API_URL}/artigos/${id}`, data, {
       headers
     })
-    .then(() => "Artigo atualizado com sucesso")
+    .then(() => messages.success.update)
     .catch((error: AxiosError) => {
-      let message;
-
-      if (error.response?.status === 401) {
-        message = "Operação não permitida, faça login e tente novamente";
-      } else {
-        message = "Erro ao atualizar artigo, verifique sua conexão ou entre em contato com o administrador";
-      }
+      let message = error.response?.status === 401 ? messages.error.authorization : messages.error.system;
 
       throw new Error(message);
     });
@@ -143,15 +130,9 @@ export const deleteArticle = (id: number) => {
     .delete(`${process.env.REACT_APP_API_URL}/artigos/${id}`, {
       headers
     })
-    .then(() => "Artigo excluído com sucesso")
+    .then(() => messages.success.delete)
     .catch((error: AxiosError) => {
-      let message;
-
-      if (error.response?.status === 401) {
-        message = "Operação não permitida, faça login e tente novamente";
-      } else {
-        message = "Erro ao excluir artigo, verifique sua conexão ou entre em contato com o administrador";
-      }
+      let message = error.response?.status === 401 ? messages.error.authorization : messages.error.system;
 
       throw new Error(message);
     });
