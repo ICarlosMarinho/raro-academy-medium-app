@@ -100,3 +100,37 @@ export const saveArticle = (titulo: string, imagem: string, resumo: string, cont
       throw new Error(message);
     });
 };
+
+export const updateArticle = (
+  id: number,
+  titulo: string,
+  imagem: string,
+  resumo: string,
+  conteudo: string
+) => {
+  const tokenData = getTokenDataFromStorage();
+  const headers = tokenData ? { Authorization: `Bearer ${tokenData.token}` } : undefined;
+  const data = {
+    titulo,
+    imagem,
+    resumo,
+    conteudo
+  };
+
+  return axios
+    .patch(`${process.env.REACT_APP_API_URL}/artigos/${id}`, data, {
+      headers
+    })
+    .then(() => "Artigo atualizado com sucesso")
+    .catch((error: AxiosError) => {
+      let message;
+
+      if (error.response?.status === 401) {
+        message = "Operação não permitida, faça login e tente novamente";
+      } else {
+        message = "Erro ao atualizar artigo, verifique sua conexão ou entre em contato com o administrador";
+      }
+
+      throw new Error(message);
+    });
+};
