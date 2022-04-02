@@ -63,3 +63,12 @@ export const getMyArticles = (titulo = "") => {
       throw new Error(message);
     });
 };
+
+export const getArticle = (id: number) => {
+  return axios
+    .get<Article>(`${process.env.REACT_APP_API_URL}/artigos/${id}`)
+    .then(({ data }) => parseArticle(data))
+    .catch((_error: AxiosError) => {
+      throw new Error("Erro ao buscar artigo, verifique sua conexão ou entre em contato com o administrador");
+    });
+};
