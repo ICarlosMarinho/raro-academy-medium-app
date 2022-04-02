@@ -1,4 +1,5 @@
 import axios, { AxiosError } from "axios";
+import { parseArticle } from "../helpers";
 import { AuthResponseData } from "./services.model";
 
 export const authenticate = (login: string, senha: string) => {
@@ -18,5 +19,20 @@ export const authenticate = (login: string, senha: string) => {
       }
 
       throw new Error(message);
+    });
+};
+
+export const getArticles = (titulo = "") => {
+  const params = titulo.length ? { titulo } : {};
+
+  return axios
+    .get<Article[]>(`${process.env.REACT_APP_API_URL}/artigos`, {
+      params
+    })
+    .then(({ data }) => data.map((article) => parseArticle(article)))
+    .catch((_error: AxiosError) => {
+      throw new Error(
+        "Erro ao buscar artigos, verifique sua conexão ou entre em contato com o administrador"
+      );
     });
 };
