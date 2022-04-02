@@ -16,3 +16,8 @@ interface Author {
   senha?: string;
   avatar: string;
 }
+
+interface TokenData {
+  userId: number;
+  token: string;
+}

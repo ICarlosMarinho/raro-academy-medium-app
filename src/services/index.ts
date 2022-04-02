@@ -1,14 +1,16 @@
 import axios, { AxiosError } from "axios";
-import { parseArticle } from "../helpers";
-import { AuthResponseData } from "./services.model";
+import { getTokenDataFromStorage, parseArticle } from "../helpers";
 
-export const authenticate = (login: string, senha: string) => {
+export const authenticate = (login: string, senha: string): Promise<TokenData> => {
   return axios
-    .post<AuthResponseData>(`${process.env.REACT_APP_API_URL}/auth/login`, {
+    .post(`${process.env.REACT_APP_API_URL}/auth/login`, {
       login,
       senha
     })
-    .then((response) => response.data)
+    .then(({ data }) => ({
+      userId: data.id,
+      token: data.access_token
+    }))
     .catch((error: AxiosError) => {
       let message;
 
@@ -34,5 +36,30 @@ export const getArticles = (titulo = "") => {
       throw new Error(
         "Erro ao buscar artigos, verifique sua conexão ou entre em contato com o administrador"
       );
+    });
+};
+
+export const getMyArticles = (titulo = "") => {
+  const tokenData = getTokenDataFromStorage();
+  const headers = tokenData ? { Authorization: `Bearer ${tokenData.token}` } : undefined;
+
+  const params = titulo.length ? { titulo } : {};
+
+  return axios
+    .get<Article[]>(`${process.env.REACT_APP_API_URL}/artigos/meus-artigos`, {
+      headers,
+      params
+    })
+    .then(({ data }) => data.map((article) => parseArticle(article)))
+    .catch((error: AxiosError) => {
+      let message;
+
+      if (error.response?.status === 401) {
+        message = "Operação não permitida, faça login e tente novamente";
+      } else {
+        message = "Erro ao autenticar, verifique sua conexão ou entre em contato com o administrador";
+      }
+
+      throw new Error(message);
     });
 };
