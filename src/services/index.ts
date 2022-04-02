@@ -134,3 +134,25 @@ export const updateArticle = (
       throw new Error(message);
     });
 };
+
+export const deleteArticle = (id: number) => {
+  const tokenData = getTokenDataFromStorage();
+  const headers = tokenData ? { Authorization: `Bearer ${tokenData.token}` } : undefined;
+
+  return axios
+    .delete(`${process.env.REACT_APP_API_URL}/artigos/${id}`, {
+      headers
+    })
+    .then(() => "Artigo excluído com sucesso")
+    .catch((error: AxiosError) => {
+      let message;
+
+      if (error.response?.status === 401) {
+        message = "Operação não permitida, faça login e tente novamente";
+      } else {
+        message = "Erro ao excluir artigo, verifique sua conexão ou entre em contato com o administrador";
+      }
+
+      throw new Error(message);
+    });
+};
