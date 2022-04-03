@@ -15,23 +15,11 @@ export const Login = () => {
         <form className="mt-8 space-y-6" action="#">
           <div className="rounded-md shadow-sm -space-y-px">
             <div className="mt-5">
-              <Input
-                type="text"
-                name="login"
-                label="Login"
-                placeholder="login"
-                required
-              />
+              <Input type="text" id="login" label="Login" placeholder="login" required />
             </div>
 
             <div className="mt-5">
-              <Input
-                type="password"
-                name="senha"
-                label="senha"
-                placeholder="********"
-                required
-              />
+              <Input type="password" id="senha" label="senha" placeholder="********" required />
             </div>
           </div>
           <div>
@@ -40,5 +28,5 @@ export const Login = () => {
         </form>
       </div>
     </div>
-  )
+  );
 };

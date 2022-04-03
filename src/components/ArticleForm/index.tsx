@@ -11,33 +11,12 @@ export const ArticleForm = () => {
           <span className="font-normal">please fill in your information to continue</span>
         </h1>
         <form className="mt-6">
-          <Input
-            placeholder="Digite aqui o título"
-            type="text"
-            name="titulo"
-            label="Titulo"
-            required
-          />
-          <Input
-            placeholder="Breve rewsumo do artigo"
-            type="textarea"
-            name="resumo"
-            label="Resumo"
-            required
-          />
+          <Input placeholder="Digite aqui o título" type="text" id="titulo" label="Titulo" required />
+          <Input placeholder="Breve rewsumo do artigo" type="textarea" id="resumo" label="Resumo" required />
 
-          <Input
-            placeholder="Breve rewsumo do artigo"
-            type="file"
-            name="image"
-            label="Banner"
-            required
-          />
+          <Input placeholder="Breve rewsumo do artigo" type="file" id="image" label="Banner" required />
 
-          <RitchTextEditor
-            label="Conteúdo"
-            name="conteudo"
-          />
+          <RitchTextEditor label="Conteúdo" name="conteudo" />
 
           <Button type="submit">Salvar</Button>
         </form>
