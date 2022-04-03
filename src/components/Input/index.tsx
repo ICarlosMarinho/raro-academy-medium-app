@@ -1,20 +1,14 @@
-import React, { HTMLInputTypeAttribute } from "react";
+import React, { HTMLInputTypeAttribute, InputHTMLAttributes, TextareaHTMLAttributes } from "react";
 
 export type InputProps = {
-  name: string;
+  id: string;
   label: string;
-  placeholder?: string;
-  type: HTMLInputTypeAttribute | 'textarea';
-  required?: boolean;
-}
+  type: HTMLInputTypeAttribute | "textarea";
+};
 
-export const Input: React.FC<InputProps> = ({
-  name,
-  label,
-  placeholder = '',
-  type,
-  required = false
-}) => {
+export const Input: React.FC<
+  InputProps & (InputHTMLAttributes<HTMLInputElement> | TextareaHTMLAttributes<HTMLTextAreaElement>)
+> = ({ id, label, type, ...rest }) => {
   const inputClassNames = `
     rounded-lg border border-gray-300 px-4 py-2 w-full
     block w-full p-3 mt-2
@@ -24,33 +18,24 @@ export const Input: React.FC<InputProps> = ({
 
   return (
     <>
-      <label
-        htmlFor={ name }
-        className="block mt-2 text-xs font-semibold text-gray-600 uppercase"
-      >{ label }</label>
-      {
-        type === 'textarea' ?
-          (
-            <textarea
-              id={ name }
-              rows={ 2 }
-              name={ name }
-              placeholder={ placeholder }
-              required={ required }
-              className={ inputClassNames }
-            /> 
-          ) :
-          (
-            <input
-              id={ name }
-              type={ type }
-              name={ name }
-              placeholder={ placeholder }
-              className={ `${inputClassNames} resize-none` }
-              required={ required }
-            />
-          )
-      }
+      <label htmlFor={id} className="block mt-2 text-xs font-semibold text-gray-600 uppercase">
+        {label}
+      </label>
+      {type === "textarea" ? (
+        <textarea
+          id={id}
+          rows={2}
+          className={inputClassNames}
+          {...(rest as TextareaHTMLAttributes<HTMLTextAreaElement>)}
+        />
+      ) : (
+        <input
+          id={id}
+          type={type}
+          className={`${inputClassNames} resize-none`}
+          {...(rest as InputHTMLAttributes<HTMLInputElement>)}
+        />
+      )}
     </>
   );
 };
