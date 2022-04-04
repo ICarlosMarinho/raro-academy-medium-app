@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ArticleForm } from "../../components/ArticleForm";
-import { Message } from "../../components/Error";
+import { Message } from "../../components/Message";
 import { getArticle, updateArticle, createArticle } from "../../services";
 
 export const EditarArquivoPage = () => {
