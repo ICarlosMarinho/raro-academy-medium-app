@@ -19,7 +19,7 @@ export const ArtigosPage = () => {
     return loading ? (
       <Message variant="info">Carregando...</Message>
     ) : (
-      !error.hasError && <ArticleList articles={articles} />
+      !error.hasError && <ArticleList articles={articles} setArticles={setArticles} />
     );
   };
 
