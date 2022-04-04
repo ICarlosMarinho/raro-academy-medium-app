@@ -1,28 +1,40 @@
-import faker from "@faker-js/faker";
 import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { ArticleView } from "../../components/ArticleView";
+import { Message } from "../../components/Message";
+import { getArticle } from "../../services";
 
 export const ArtigoPage = () => {
-  const [article, setArticle] = useState<string>("");
-  const [autor] = useState({
-    nome: faker.name.firstName(),
-    avatar: faker.image.avatar()
-  });
-  const [dataPublicacao] = useState(new Date());
+  const [article, setArticle] = useState<Article | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<RequestError>({ message: "", hasError: false });
+  const { id } = useParams();
 
   useEffect(() => {
-    async function loadArticle() {
-      const response = await fetch("/article.md");
-      const article = await response.text();
-      setArticle(article);
+    if (id) {
+      getArticle(parseInt(id))
+        .then((result) => setArticle(result))
+        .catch((error) => setError({ message: error.message, hasError: true }))
+        .finally(() => setLoading(false));
     }
-
-    loadArticle();
   }, []);
+
+  const renderArticleView = () => {
+    return !article && loading ? (
+      <Message variant="info">Carregando...</Message>
+    ) : (
+      article && <ArticleView article={article} />
+    );
+  };
+
+  const renderError = () => {
+    return error.hasError ? <Message variant="error">{error.message}</Message> : null;
+  };
 
   return (
     <div className="m-10">
-      <ArticleView article={article} autor={autor} dataPublicacao={dataPublicacao} tempoLeitura={"10min"} />
+      {renderArticleView()}
+      {renderError()}
     </div>
   );
 };
