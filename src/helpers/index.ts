@@ -43,6 +43,16 @@ export const setTokenDataToStorage = (tokenData: TokenData) => {
   }
 };
 
+export const clearTokenDataFromStorage = () => {
+  try {
+    localStorage.removeItem("tokenData");
+
+    return true;
+  } catch (_error) {
+    return false;
+  }
+};
+
 export const getBase64 = (image: File) => {
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
