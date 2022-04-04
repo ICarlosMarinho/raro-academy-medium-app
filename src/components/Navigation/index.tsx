@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { clearTokenDataFromStorage, getTokenDataFromStorage } from "../../helpers";
+import { ActivableLink } from "../ActivableLink";
 
 export const Navigation = () => {
   const [authenticated, setAuthenticated] = useState(false);
@@ -26,11 +27,11 @@ export const Navigation = () => {
 
   return (
     <>
-      <Link to="/">Home</Link>
+      <ActivableLink to="/">Home</ActivableLink>
       {authenticated && (
         <>
-          <Link to="/artigos">Meus Artigos</Link>
-          <Link to="/artigos/novo">Novo Artigo</Link>
+          <ActivableLink to="/artigos">Meus Artigos</ActivableLink>
+          <ActivableLink to="/artigos/novo">Novo Artigo</ActivableLink>
         </>
       )}
       {renderAuthLink()}
