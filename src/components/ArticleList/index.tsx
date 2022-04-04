@@ -6,7 +6,7 @@ export const ArticleList: React.FC<{ articles: Article[] }> = ({ articles }) => 
   return articles.length ? (
     <div className="flex flex-col items-center justify-center m-10">
       {articles.map((article) => (
-        <ArticleThumbnail key={article.titulo} {...article} />
+        <ArticleThumbnail key={article.id} {...article} />
       ))}
     </div>
   ) : (
