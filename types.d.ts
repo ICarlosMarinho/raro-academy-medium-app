@@ -22,3 +22,8 @@ interface TokenData {
   userId: number;
   token: string;
 }
+
+interface RequestError {
+  message: string;
+  hasError: boolean;
+}
