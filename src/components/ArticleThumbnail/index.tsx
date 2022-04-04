@@ -1,19 +1,18 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { formataData } from "../../helpers/";
-import { ArticleThumbnailProps } from "./ArticleThumbnail.types";
 
-export const ArticleThumbnail: React.FC<ArticleThumbnailProps> = ({
+export const ArticleThumbnail: React.FC<Article> = ({
   id,
   imagem,
   titulo,
   resumo,
   dataPublicacao,
-  tempoLeitura = "7 min",
-  autor,
-  editavel
+  tempoLeitura,
+  autor
 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const getHandleClick = (edit: boolean = false) => {
     return () => {
@@ -41,7 +40,7 @@ export const ArticleThumbnail: React.FC<ArticleThumbnailProps> = ({
         <div className="text-gray-500 text-xs my-1 hover:cursor-pointer" onClick={getHandleClick()}>
           {tempoLeitura} de leitura
         </div>
-        {editavel && (
+        {location.pathname === "/artigos" && (
           <button
             onClick={getHandleClick(true)}
             className={`
