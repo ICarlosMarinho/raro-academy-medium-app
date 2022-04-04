@@ -8,7 +8,7 @@ export const ArticleThumbnail: React.FC<Article> = ({
   titulo,
   resumo,
   dataPublicacao,
-  tempoLeitura,
+  tempoDeLeitura,
   autor
 }) => {
   const navigate = useNavigate();
@@ -38,7 +38,7 @@ export const ArticleThumbnail: React.FC<Article> = ({
       </div>
       <footer className="flex flex-row pt-7 gap-3 items-center">
         <div className="text-gray-500 text-xs my-1 hover:cursor-pointer" onClick={getHandleClick()}>
-          {tempoLeitura} de leitura
+          {tempoDeLeitura ? `${tempoDeLeitura} min de leitura` : ""}
         </div>
         {location.pathname === "/artigos" && (
           <button

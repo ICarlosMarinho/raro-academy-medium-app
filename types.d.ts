@@ -6,7 +6,7 @@ interface Article {
   conteudo?: string;
   dataPublicacao: Date = new Date();
   dataAtualizacao: Date = new Date();
-  tempoLeitura: string = `Mais de ${Math.random() * 10 + 1} min`;
+  tempoDeLeitura?: string;
   autor: Author;
 }
 
