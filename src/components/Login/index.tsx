@@ -4,8 +4,7 @@ import { authenticate } from "../../services";
 import { Button } from "../Button";
 import { Input } from "../Input";
 import { setTokenDataToStorage } from "../../helpers";
-import { RequestError } from "./Login.model";
-import { Error } from "../Error";
+import { Message } from "../Message";
 
 export const Login = () => {
   const [login, setLogin] = useState("");
@@ -38,7 +37,7 @@ export const Login = () => {
   };
 
   const renderError = () => {
-    return requestError.hasError ? <Error>{requestError.message}</Error> : null;
+    return requestError.hasError ? <Message variant="error">{requestError.message}</Message> : null;
   };
 
   return (
