@@ -4,11 +4,11 @@ import { ArticleThumbnail } from "../ArticleThumbnail";
 import { Message } from "../Message";
 
 export const ArticleList: FC = () => {
-  const { state } = useContext(ArticlesContext);
+  const { articlesState } = useContext(ArticlesContext);
 
-  return state.articles.length ? (
+  return articlesState.articles.length ? (
     <div className="flex flex-col items-center justify-center m-10">
-      {state.articles.map((article) => (
+      {articlesState.articles.map((article) => (
         <ArticleThumbnail article={article} key={article.id} />
       ))}
     </div>

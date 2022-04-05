@@ -9,7 +9,7 @@ import { ComponentProps } from "./ArticleThumbnail.model";
 export const ArticleThumbnail: FC<ComponentProps> = ({ article }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { dispatch } = useContext(ArticlesContext);
+  const { articlesDispatch } = useContext(ArticlesContext);
   const [deleteClicked, setDeleteClicked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<RequestError>({ message: "", hasError: false });
@@ -31,7 +31,7 @@ export const ArticleThumbnail: FC<ComponentProps> = ({ article }) => {
       deleteArticle(article.id)
         .then(() => {
           return getMyArticles().then((result) => {
-            dispatch({ type: "SET_ARTICLES", payload: { articles: result } });
+            articlesDispatch({ type: "SET_ARTICLES", payload: result });
             setLoading(false);
           });
         })

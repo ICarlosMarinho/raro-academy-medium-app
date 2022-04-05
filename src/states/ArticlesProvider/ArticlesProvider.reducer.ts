@@ -1,11 +1,11 @@
-import { Action, State } from "./ArticlesProvider.model";
+import { ArticlesAction, ArticlesState } from "./ArticlesProvider.model";
 
-const reducer = (state: State, action: Action): State => {
+const reducer = (state: ArticlesState, action: ArticlesAction): ArticlesState => {
   switch (action.type) {
     case "SET_ARTICLES":
       return {
         ...state,
-        articles: action.payload.articles
+        articles: action.payload
       };
     default:
       return state;
