@@ -8,13 +8,25 @@ import { NotFoundPage } from "./pages/NotFound";
 import { Layout } from "./components/Layout";
 import { RequireAuth } from "./components/RequireAuth";
 import { getArticles, getMyArticles } from "./services";
+import { UserContext } from "./states/UserProvider";
+import { useContext, useEffect } from "react";
+import { clearTokenDataFromStorage, setTokenDataToStorage } from "./helpers";
 
 function App() {
+  const { userState } = useContext(UserContext);
+
+  useEffect(() => {
+    if (userState.tokenData) {
+      setTokenDataToStorage(userState.tokenData);
+    } else {
+      clearTokenDataFromStorage();
+    }
+  }, [userState]);
+
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
-
         <Route path="/" element={<Layout />}>
           <Route index element={<ArtigosPage request={getArticles} />} />
           <Route path="/artigo/:id" element={<ArtigoPage />} />
@@ -25,7 +37,6 @@ function App() {
             <Route path="/artigos/novo" element={<EditarArquivoPage />} />
           </Route>
         </Route>
-
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
