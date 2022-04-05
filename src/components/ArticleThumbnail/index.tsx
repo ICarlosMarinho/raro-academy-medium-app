@@ -1,13 +1,15 @@
-import React, { FC, useState } from "react";
+import React, { FC, useContext, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { formataData } from "../../helpers/";
 import { deleteArticle, getMyArticles } from "../../services";
+import { ArticlesContext } from "../../states/ArticlesProvider";
 import { Message } from "../Message";
 import { ComponentProps } from "./ArticleThumbnail.model";
 
-export const ArticleThumbnail: FC<ComponentProps> = ({ article, setArticles }) => {
+export const ArticleThumbnail: FC<ComponentProps> = ({ article }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { dispatch } = useContext(ArticlesContext);
   const [deleteClicked, setDeleteClicked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<RequestError>({ message: "", hasError: false });
@@ -29,7 +31,7 @@ export const ArticleThumbnail: FC<ComponentProps> = ({ article, setArticles }) =
       deleteArticle(article.id)
         .then(() => {
           return getMyArticles().then((result) => {
-            setArticles(result);
+            dispatch({ type: "SET_ARTICLES", payload: { articles: result } });
             setLoading(false);
           });
         })
@@ -77,7 +79,12 @@ export const ArticleThumbnail: FC<ComponentProps> = ({ article, setArticles }) =
   return (
     <div className="flex flex-col w-2/3 mt-5">
       <header className="flex flex-row gap-3 items-center hover:cursor-pointer" onClick={getHandleClick()}>
-        <img src={article.autor.avatar} className="rounded-full" style={{ width: "30px", height: "30px" }} />
+        <img
+          src={article.autor.avatar}
+          alt={`Avatar de ${article.autor.avatar}`}
+          className="rounded-full"
+          style={{ width: "30px", height: "30px" }}
+        />
         <div>{article.autor.nome}</div>
         <div className="text-sm text-gray-500">{formataData(article.dataPublicacao)}</div>
       </header>
