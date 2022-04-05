@@ -1,31 +1,23 @@
-import { useEffect, useState } from "react";
-import { useMatch } from "react-router-dom";
+import { FC, useContext, useEffect, useState } from "react";
 import { ArticleList } from "../../components/ArticleList";
 import { Message } from "../../components/Message";
-import { getArticles, getMyArticles } from "../../services";
+import { ArticlesContext } from "../../states/ArticlesProvider";
+import { ComponentProps } from "./Artigos.model";
 
-export const ArtigosPage = () => {
-  const match = useMatch("/artigos");
-
-  const [articles, setArticles] = useState<Article[]>([]);
+export const ArtigosPage: FC<ComponentProps> = ({ request }) => {
+  const { dispatch } = useContext(ArticlesContext);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<RequestError>({ message: "", hasError: false });
 
   useEffect(() => {
-    const request = match !== null ? getMyArticles : getArticles;
-
     request()
-      .then((result) => setArticles(result))
+      .then((result) => dispatch({ type: "SET_ARTICLES", payload: { articles: result } }))
       .catch((error) => setError({ message: error.message, hasError: true }))
       .finally(() => setLoading(false));
   }, []);
 
   const renderAticles = () => {
-    return loading ? (
-      <Message variant="info">Carregando...</Message>
-    ) : (
-      !error.hasError && <ArticleList articles={articles} setArticles={setArticles} />
-    );
+    return loading ? <Message variant="info">Carregando...</Message> : !error.hasError && <ArticleList />;
   };
 
   const renderError = () => {
