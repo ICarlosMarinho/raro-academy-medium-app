@@ -1,13 +1,15 @@
-import React from "react";
+import React, { FC, useContext } from "react";
+import { ArticlesContext } from "../../states/ArticlesProvider";
 import { ArticleThumbnail } from "../ArticleThumbnail";
 import { Message } from "../Message";
-import { ComponentProps } from "./ArticleList.model";
 
-export const ArticleList: React.FC<ComponentProps> = ({ articles, setArticles }) => {
-  return articles.length ? (
+export const ArticleList: FC = () => {
+  const { state } = useContext(ArticlesContext);
+
+  return state.articles.length ? (
     <div className="flex flex-col items-center justify-center m-10">
-      {articles.map((article) => (
-        <ArticleThumbnail key={article.id} article={article} setArticles={setArticles} />
+      {state.articles.map((article) => (
+        <ArticleThumbnail article={article} key={article.id} />
       ))}
     </div>
   ) : (

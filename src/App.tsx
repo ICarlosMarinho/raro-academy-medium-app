@@ -7,6 +7,7 @@ import { EditarArquivoPage } from "./pages/EditarArtigo";
 import { NotFoundPage } from "./pages/NotFound";
 import { Layout } from "./components/Layout";
 import { RequireAuth } from "./components/RequireAuth";
+import { getArticles, getMyArticles } from "./services";
 
 function App() {
   return (
@@ -15,12 +16,12 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
 
         <Route path="/" element={<Layout />}>
-          <Route index element={<ArtigosPage />} />
+          <Route index element={<ArtigosPage request={getArticles} />} />
           <Route path="/artigo/:id" element={<ArtigoPage />} />
 
           <Route element={<RequireAuth />}>
             <Route path="artigo/edit/:id" element={<EditarArquivoPage />} />
-            <Route path="/artigos" element={<ArtigosPage />} />
+            <Route path="/artigos" element={<ArtigosPage request={getMyArticles} />} />
             <Route path="/artigos/novo" element={<EditarArquivoPage />} />
           </Route>
         </Route>
