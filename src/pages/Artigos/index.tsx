@@ -5,13 +5,13 @@ import { ArticlesContext } from "../../states/ArticlesProvider";
 import { ComponentProps } from "./Artigos.model";
 
 export const ArtigosPage: FC<ComponentProps> = ({ request }) => {
-  const { dispatch } = useContext(ArticlesContext);
+  const { articlesDispatch } = useContext(ArticlesContext);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<RequestError>({ message: "", hasError: false });
 
   useEffect(() => {
     request()
-      .then((result) => dispatch({ type: "SET_ARTICLES", payload: { articles: result } }))
+      .then((result) => articlesDispatch({ type: "SET_ARTICLES", payload: result }))
       .catch((error) => setError({ message: error.message, hasError: true }))
       .finally(() => setLoading(false));
   }, []);

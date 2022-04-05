@@ -1,20 +1,24 @@
 import { createContext, FC, useReducer } from "react";
-import { ContextValue, State } from "./ArticlesProvider.model";
+import { ArticlesContextValue, ArticlesState } from "./ArticlesProvider.model";
 import reducer from "./ArticlesProvider.reducer";
 
-const defaultState: State = {
+const defaultState: ArticlesState = {
   articles: []
 };
 
-export const ArticlesContext = createContext<ContextValue>({
-  state: defaultState,
-  dispatch: () => {}
+export const ArticlesContext = createContext<ArticlesContextValue>({
+  articlesState: defaultState,
+  articlesDispatch: () => {}
 });
 
 const ArticlesProvider: FC = ({ children }) => {
-  const [state, dispatch] = useReducer(reducer, defaultState);
+  const [articlesState, articlesDispatch] = useReducer(reducer, defaultState);
 
-  return <ArticlesContext.Provider value={{ state, dispatch }}>{children}</ArticlesContext.Provider>;
+  return (
+    <ArticlesContext.Provider value={{ articlesState, articlesDispatch }}>
+      {children}
+    </ArticlesContext.Provider>
+  );
 };
 
 export default ArticlesProvider;

@@ -1,17 +1,15 @@
 import { Dispatch } from "react";
 
-export interface State {
+export interface ArticlesState {
   articles: Article[];
 }
 
-export interface Payload extends State {}
-
-export interface Action {
+export interface ArticlesAction {
   type: "SET_ARTICLES";
-  payload: Payload;
+  payload: Article[];
 }
 
-export interface ContextValue {
-  state: State;
-  dispatch: Dispatch<Action>;
+export interface ArticlesContextValue {
+  articlesState: ArticlesState;
+  articlesDispatch: Dispatch<ArticlesAction>;
 }
