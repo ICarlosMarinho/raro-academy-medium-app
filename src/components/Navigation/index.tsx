@@ -1,22 +1,17 @@
-import { useEffect, useState } from "react";
+import { useContext } from "react";
 import { Link } from "react-router-dom";
-import { clearTokenDataFromStorage, getTokenDataFromStorage } from "../../helpers";
+import { UserContext } from "../../states/UserProvider";
 import { ActivableLink } from "../ActivableLink";
 
 export const Navigation = () => {
-  const [authenticated, setAuthenticated] = useState(false);
-
-  useEffect(() => {
-    setAuthenticated(getTokenDataFromStorage() !== null);
-  }, []);
+  const { userState, userDispatch } = useContext(UserContext);
 
   const handleClick = () => {
-    clearTokenDataFromStorage();
-    setAuthenticated(false);
+    userDispatch({ type: "SET_TOKEN_DATA", payload: null });
   };
 
   const renderAuthLink = () => {
-    return authenticated ? (
+    return userState.tokenData ? (
       <Link to="/" onClick={handleClick}>
         Sair
       </Link>
@@ -28,7 +23,7 @@ export const Navigation = () => {
   return (
     <>
       <ActivableLink to="/">Home</ActivableLink>
-      {authenticated && (
+      {userState.tokenData && (
         <>
           <ActivableLink to="/artigos">Meus Artigos</ActivableLink>
           <ActivableLink to="/artigos/novo">Novo Artigo</ActivableLink>

@@ -1,10 +1,10 @@
-import { ChangeEvent, Dispatch, FormEvent, SetStateAction, useEffect, useState } from "react";
+import { ChangeEvent, Dispatch, FormEvent, SetStateAction, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { authenticate } from "../../services";
 import { Button } from "../Button";
 import { Input } from "../Input";
-import { setTokenDataToStorage } from "../../helpers";
 import { Message } from "../Message";
+import { UserContext } from "../../states/UserProvider";
 
 export const Login = () => {
   const [login, setLogin] = useState("");
@@ -12,6 +12,7 @@ export const Login = () => {
   const [loading, setLoading] = useState(false);
   const [requestError, setRequestError] = useState<RequestError>({ hasError: false, message: "" });
   const navigate = useNavigate();
+  const { userDispatch } = useContext(UserContext);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -20,7 +21,7 @@ export const Login = () => {
 
     authenticate(login, senha)
       .then((tokenData) => {
-        setTokenDataToStorage(tokenData);
+        userDispatch({ type: "SET_TOKEN_DATA", payload: tokenData });
         setLoading(false);
         navigate("/artigos");
       })
