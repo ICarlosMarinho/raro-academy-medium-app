@@ -6,8 +6,8 @@ export interface RequestState {
 }
 
 export interface RequestAction {
-  type: "SET_LOADING" | "SET_ERROR";
-  payload: boolean | RequestError;
+  type: "SET_LOADING" | "SET_ERROR" | "SET_DEFAULT";
+  payload?: boolean | RequestError;
 }
 
 export interface RequestContextValue {

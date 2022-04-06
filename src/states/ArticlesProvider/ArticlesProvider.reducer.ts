@@ -5,8 +5,10 @@ const reducer = (state: ArticlesState, action: ArticlesAction): ArticlesState =>
     case "SET_ARTICLES":
       return {
         ...state,
-        articles: action.payload
+        articles: action.payload as Article[]
       };
+    case "SET_DEFAULT":
+      return { articles: [] };
     default:
       return state;
   }

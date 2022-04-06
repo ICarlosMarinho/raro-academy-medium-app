@@ -5,8 +5,8 @@ export interface ArticlesState {
 }
 
 export interface ArticlesAction {
-  type: "SET_ARTICLES";
-  payload: Article[];
+  type: "SET_ARTICLES" | "SET_DEFAULT";
+  payload?: Article[];
 }
 
 export interface ArticlesContextValue {

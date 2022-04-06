@@ -1,30 +1,34 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ArticleForm } from "../../components/ArticleForm";
 import { Message } from "../../components/Message";
+import { RequestResult } from "../../components/RequestResult";
 import { getArticle, updateArticle, createArticle } from "../../services";
+import { RequestContext } from "../../states/RequestProvider";
 
 export const EditarArquivoPage = () => {
   const { id } = useParams();
+  const { requestDispatch } = useContext(RequestContext);
   const [article, setArticle] = useState<Article | null>(null);
-  const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-  const [error, setError] = useState<RequestError>({ message: "", hasError: false });
 
   useEffect(() => {
     if (id) {
-      setLoading(true);
+      requestDispatch({ type: "SET_DEFAULT" });
+      requestDispatch({ type: "SET_LOADING", payload: true });
 
       getArticle(parseInt(id))
         .then((result) => setArticle(result))
-        .catch((error) => setError({ message: error.message, hasError: true }))
-        .finally(() => setLoading(false));
+        .catch((error) =>
+          requestDispatch({ type: "SET_ERROR", payload: { message: error.message, hasError: true } })
+        )
+        .finally(() => requestDispatch({ type: "SET_LOADING", payload: false }));
     }
   }, [id]);
 
   const onSubmit = (article: Article) => {
-    setLoading(true);
-    setError({ message: "", hasError: false });
+    requestDispatch({ type: "SET_DEFAULT" });
+    requestDispatch({ type: "SET_LOADING", payload: true });
     setSuccessMessage("");
 
     if (id) {
@@ -32,39 +36,32 @@ export const EditarArquivoPage = () => {
 
       updateArticle(id, titulo, imagem, resumo, conteudo as string)
         .then((message) => setSuccessMessage(message))
-        .catch((error) => setError({ message: error.message, hasError: true }))
-        .finally(() => setLoading(false));
+        .catch((error) =>
+          requestDispatch({ type: "SET_ERROR", payload: { message: error.message, hasError: true } })
+        )
+        .finally(() => requestDispatch({ type: "SET_LOADING", payload: false }));
     } else {
       const { titulo, conteudo, resumo, imagem } = article;
 
       createArticle(titulo, imagem, resumo, conteudo as string)
         .then((message) => setSuccessMessage(message))
-        .catch((error) => setError({ message: error.message, hasError: true }))
-        .finally(() => setLoading(false));
+        .catch((error) =>
+          requestDispatch({ type: "SET_ERROR", payload: { message: error.message, hasError: true } })
+        )
+        .finally(() => requestDispatch({ type: "SET_LOADING", payload: false }));
     }
-  };
-
-  const renderArticleForm = () => {
-    return !article && loading ? (
-      <Message variant="info">Carregando...</Message>
-    ) : (
-      <ArticleForm article={article} onSubmit={onSubmit} loading={loading} />
-    );
   };
 
   const renderSuccessMessage = () => {
     return successMessage ? <Message variant="info">{successMessage}</Message> : null;
   };
 
-  const renderError = () => {
-    return error.hasError ? <Message variant="error">{error.message}</Message> : null;
-  };
-
   return (
     <div className="items-center justify-center m-10">
-      {renderArticleForm()}
-      {renderError()}
-      {renderSuccessMessage()}
+      <RequestResult>
+        <ArticleForm article={article} onSubmit={onSubmit} />
+        {renderSuccessMessage()}
+      </RequestResult>
     </div>
   );
 };
