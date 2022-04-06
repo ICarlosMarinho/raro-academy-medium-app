@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios";
-import { getTokenDataFromStorage, parseArticle } from "../helpers";
+import { parseArticle } from "../helpers";
 
 export const messages = {
   success: {
@@ -31,30 +31,12 @@ export const authenticate = (login: string, senha: string): Promise<TokenData> =
     });
 };
 
-export const getArticles = (titulo = "") => {
-  const params = titulo.length ? { titulo } : {};
-
-  return axios
-    .get<Article[]>(`${process.env.REACT_APP_API_URL}/artigos`, {
-      params
-    })
-    .then(({ data }) => data.map((article) => parseArticle(article)))
-    .catch((_error: AxiosError) => {
-      throw new Error(messages.error.system);
-    });
-};
-
-export const getMyArticles = (titulo = "") => {
-  const tokenData = getTokenDataFromStorage();
+export const getArticles = (tokenData: TokenData | null, titulo = "") => {
+  const params = titulo.length ? { titulo } : undefined;
   const headers = tokenData ? { Authorization: `Bearer ${tokenData.token}` } : undefined;
-
-  const params = titulo.length ? { titulo } : {};
-
+  const url = `${process.env.REACT_APP_API_URL}/artigos/${tokenData ? "meus-artigos" : ""}`;
   return axios
-    .get<Article[]>(`${process.env.REACT_APP_API_URL}/artigos/meus-artigos`, {
-      headers,
-      params
-    })
+    .get<Article[]>(url, { headers, params })
     .then(({ data }) => data.map((article) => parseArticle(article)))
     .catch((error: AxiosError) => {
       let message = error.response?.status === 401 ? messages.error.authorization : messages.error.system;
@@ -72,8 +54,13 @@ export const getArticle = (id: number) => {
     });
 };
 
-export const createArticle = (titulo: string, imagem: string, resumo: string, conteudo: string) => {
-  const tokenData = getTokenDataFromStorage();
+export const createArticle = (
+  titulo: string,
+  imagem: string,
+  resumo: string,
+  conteudo: string,
+  tokenData: TokenData | null
+) => {
   const headers = tokenData ? { Authorization: `Bearer ${tokenData.token}` } : undefined;
   const data = {
     titulo,
@@ -99,9 +86,9 @@ export const updateArticle = (
   titulo: string,
   imagem: string,
   resumo: string,
-  conteudo: string
+  conteudo: string,
+  tokenData: TokenData | null
 ) => {
-  const tokenData = getTokenDataFromStorage();
   const headers = tokenData ? { Authorization: `Bearer ${tokenData.token}` } : undefined;
   const data = {
     titulo,
@@ -122,8 +109,7 @@ export const updateArticle = (
     });
 };
 
-export const deleteArticle = (id: number) => {
-  const tokenData = getTokenDataFromStorage();
+export const deleteArticle = (id: number, tokenData: TokenData | null) => {
   const headers = tokenData ? { Authorization: `Bearer ${tokenData.token}` } : undefined;
 
   return axios
