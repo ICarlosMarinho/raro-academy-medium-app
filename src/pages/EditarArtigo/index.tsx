@@ -5,10 +5,12 @@ import { Message } from "../../components/Message";
 import { RequestResult } from "../../components/RequestResult";
 import { getArticle, updateArticle, createArticle } from "../../services";
 import { RequestContext } from "../../states/RequestProvider";
+import { UserContext } from "../../states/UserProvider";
 
 export const EditarArquivoPage = () => {
   const { id } = useParams();
   const { requestDispatch } = useContext(RequestContext);
+  const { userState } = useContext(UserContext);
   const [article, setArticle] = useState<Article | null>(null);
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -34,7 +36,7 @@ export const EditarArquivoPage = () => {
     if (id) {
       const { id, titulo, conteudo, resumo, imagem } = article;
 
-      updateArticle(id, titulo, imagem, resumo, conteudo as string)
+      updateArticle(id, titulo, imagem, resumo, conteudo as string, userState.tokenData)
         .then((message) => setSuccessMessage(message))
         .catch((error) =>
           requestDispatch({ type: "SET_ERROR", payload: { message: error.message, hasError: true } })
@@ -43,7 +45,7 @@ export const EditarArquivoPage = () => {
     } else {
       const { titulo, conteudo, resumo, imagem } = article;
 
-      createArticle(titulo, imagem, resumo, conteudo as string)
+      createArticle(titulo, imagem, resumo, conteudo as string, userState.tokenData)
         .then((message) => setSuccessMessage(message))
         .catch((error) =>
           requestDispatch({ type: "SET_ERROR", payload: { message: error.message, hasError: true } })
