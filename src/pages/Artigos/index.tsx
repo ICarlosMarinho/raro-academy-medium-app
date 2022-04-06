@@ -1,33 +1,35 @@
-import { FC, useContext, useEffect, useState } from "react";
+import { FC, useContext, useEffect } from "react";
 import { ArticleList } from "../../components/ArticleList";
-import { Message } from "../../components/Message";
+import { RequestResult } from "../../components/RequestResult";
 import { ArticlesContext } from "../../states/ArticlesProvider";
+import { RequestContext } from "../../states/RequestProvider";
 import { ComponentProps } from "./Artigos.model";
 
 export const ArtigosPage: FC<ComponentProps> = ({ request }) => {
   const { articlesDispatch } = useContext(ArticlesContext);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<RequestError>({ message: "", hasError: false });
+  const { requestState, requestDispatch } = useContext(RequestContext);
 
   useEffect(() => {
+    requestDispatch({ type: "SET_DEFAULT" });
+    requestDispatch({ type: "SET_LOADING", payload: true });
+
     request()
       .then((result) => articlesDispatch({ type: "SET_ARTICLES", payload: result }))
-      .catch((error) => setError({ message: error.message, hasError: true }))
-      .finally(() => setLoading(false));
+      .catch((error) =>
+        requestDispatch({ type: "SET_ERROR", payload: { message: error.message, hasError: true } })
+      )
+      .finally(() => requestDispatch({ type: "SET_LOADING", payload: false }));
+
+    return resetArticles;
   }, []);
 
-  const renderAticles = () => {
-    return loading ? <Message variant="info">Carregando...</Message> : !error.hasError && <ArticleList />;
-  };
-
-  const renderError = () => {
-    return error.hasError ? <Message variant="error">{error.message}</Message> : null;
+  const resetArticles = () => {
+    articlesDispatch({ type: "SET_DEFAULT" });
   };
 
   return (
     <div className="my-30">
-      {renderAticles()}
-      {renderError()}
+      <RequestResult>{!requestState.loading && <ArticleList />}</RequestResult>
     </div>
   );
 };

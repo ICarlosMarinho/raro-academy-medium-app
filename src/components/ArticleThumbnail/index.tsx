@@ -1,18 +1,17 @@
-import React, { FC, useContext, useState } from "react";
+import { FC, useContext, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { formataData } from "../../helpers/";
 import { deleteArticle, getMyArticles } from "../../services";
 import { ArticlesContext } from "../../states/ArticlesProvider";
-import { Message } from "../Message";
+import { RequestContext } from "../../states/RequestProvider";
 import { ComponentProps } from "./ArticleThumbnail.model";
 
 export const ArticleThumbnail: FC<ComponentProps> = ({ article }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { articlesDispatch } = useContext(ArticlesContext);
   const [deleteClicked, setDeleteClicked] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<RequestError>({ message: "", hasError: false });
+  const { articlesDispatch } = useContext(ArticlesContext);
+  const { requestState, requestDispatch } = useContext(RequestContext);
 
   const getHandleClick = (edit: boolean = false) => {
     return () => {
@@ -25,24 +24,23 @@ export const ArticleThumbnail: FC<ComponentProps> = ({ article }) => {
       setDeleteClicked(true);
     } else {
       setDeleteClicked(false);
-      setLoading(true);
-      setError({ message: "", hasError: false });
 
+      requestDispatch({ type: "SET_DEFAULT" });
+      requestDispatch({ type: "SET_LOADING", payload: true });
       deleteArticle(article.id)
         .then(() => {
           return getMyArticles().then((result) => {
             articlesDispatch({ type: "SET_ARTICLES", payload: result });
-            setLoading(false);
           });
         })
-        .catch((err) => {
-          setError({ message: err.message, hasError: true });
-          setLoading(false);
-        });
+        .catch((err) =>
+          requestDispatch({ type: "SET_ERROR", payload: { message: err.message, hasError: true } })
+        )
+        .finally(() => requestDispatch({ type: "SET_LOADING", payload: false }));
     }
   };
 
-  const renderEditButton = () => {
+  const renderButtons = () => {
     return location.pathname === "/artigos" ? (
       <>
         <button
@@ -55,7 +53,7 @@ export const ArticleThumbnail: FC<ComponentProps> = ({ article }) => {
           Editar
         </button>
         <button
-          disabled={loading}
+          disabled={requestState.loading}
           onClick={handleDeleteClick}
           className={`
             ${deleteClicked ? "bg-red-400" : "bg-red-300"} text-white
@@ -66,14 +64,6 @@ export const ArticleThumbnail: FC<ComponentProps> = ({ article }) => {
         </button>
       </>
     ) : null;
-  };
-
-  const renderError = () => {
-    return error.hasError ? <Message variant="error">{error.message}</Message> : null;
-  };
-
-  const renderLoading = () => {
-    return loading ? <Message variant="info">Carregando...</Message> : null;
   };
 
   return (
@@ -101,10 +91,8 @@ export const ArticleThumbnail: FC<ComponentProps> = ({ article }) => {
         <div className="text-gray-500 text-xs my-1 hover:cursor-pointer" onClick={getHandleClick()}>
           {article.tempoDeLeitura ? `${article.tempoDeLeitura} de leitura` : ""}
         </div>
-        {renderEditButton()}
+        {renderButtons()}
       </footer>
-      {renderError()}
-      {renderLoading()}
       <hr className="mt-5" />
     </div>
   );

@@ -3,12 +3,13 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
 import UserProvider from "./states/UserProvider";
+import RequestProvider from "./states/RequestProvider";
 
 ReactDOM.render(
-  <React.StrictMode>
+  <RequestProvider>
     <UserProvider>
       <App />
     </UserProvider>
-  </React.StrictMode>,
+  </RequestProvider>,
   document.getElementById("root")
 );
