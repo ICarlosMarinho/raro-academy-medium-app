@@ -1,6 +1,7 @@
 import { FC, useContext, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { formataData } from "../../helpers/";
+import useRequest from "../../hooks/useRequest";
 import { deleteArticle, getArticles } from "../../services";
 import { ArticlesContext } from "../../states/ArticlesProvider";
 import { RequestContext } from "../../states/RequestProvider";
@@ -11,9 +12,18 @@ export const ArticleThumbnail: FC<ComponentProps> = ({ article }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [deleteClicked, setDeleteClicked] = useState(false);
+  const { requestState } = useContext(RequestContext);
   const { articlesDispatch } = useContext(ArticlesContext);
   const { userState } = useContext(UserContext);
-  const { requestState, requestDispatch } = useContext(RequestContext);
+  const executeRequest = useRequest();
+
+  const requests = () => {
+    return deleteArticle(article.id, userState.tokenData).then(() => {
+      return getArticles(userState.tokenData).then((result) => {
+        articlesDispatch({ type: "SET_ARTICLES", payload: result });
+      });
+    });
+  };
 
   const getHandleClick = (edit: boolean = false) => {
     return () => {
@@ -27,18 +37,7 @@ export const ArticleThumbnail: FC<ComponentProps> = ({ article }) => {
     } else {
       setDeleteClicked(false);
 
-      requestDispatch({ type: "SET_DEFAULT" });
-      requestDispatch({ type: "SET_LOADING", payload: true });
-      deleteArticle(article.id, userState.tokenData)
-        .then(() => {
-          return getArticles(userState.tokenData).then((result) => {
-            articlesDispatch({ type: "SET_ARTICLES", payload: result });
-          });
-        })
-        .catch((err) =>
-          requestDispatch({ type: "SET_ERROR", payload: { message: err.message, hasError: true } })
-        )
-        .finally(() => requestDispatch({ type: "SET_LOADING", payload: false }));
+      executeRequest(requests);
     }
   };
 
