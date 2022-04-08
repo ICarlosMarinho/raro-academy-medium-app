@@ -1,5 +1,4 @@
 import { useContext } from "react";
-import { Link } from "react-router-dom";
 import { UserContext } from "../../states/UserProvider";
 import { ActivableLink } from "../ActivableLink";
 
@@ -12,21 +11,29 @@ export const Navigation = () => {
 
   const renderAuthLink = () => {
     return userState.tokenData ? (
-      <Link to="/" onClick={handleClick}>
+      <ActivableLink type="button" to="/" onClick={handleClick}>
         Sair
-      </Link>
+      </ActivableLink>
     ) : (
-      <Link to="/login">Login</Link>
+      <ActivableLink type="button" to="/login">
+        Login
+      </ActivableLink>
     );
   };
 
   return (
     <>
-      <ActivableLink to="/">Home</ActivableLink>
+      <ActivableLink type="link" to="/">
+        Home
+      </ActivableLink>
       {userState.tokenData && (
         <>
-          <ActivableLink to="/artigos">Meus Artigos</ActivableLink>
-          <ActivableLink to="/artigos/novo">Novo Artigo</ActivableLink>
+          <ActivableLink type="link" to="/artigos">
+            Meus Artigos
+          </ActivableLink>
+          <ActivableLink type="link" to="/artigos/novo">
+            Novo Artigo
+          </ActivableLink>
         </>
       )}
       {renderAuthLink()}
