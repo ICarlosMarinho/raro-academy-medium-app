@@ -22,7 +22,8 @@ export const authenticate = (login: string, senha: string): Promise<TokenData> =
     })
     .then(({ data }) => ({
       userId: data.id,
-      token: data.access_token
+      token: data.access_token,
+      userName: data.nome
     }))
     .catch((error: AxiosError) => {
       let message = error.response?.status === 401 ? messages.error.authentication : messages.error.system;
