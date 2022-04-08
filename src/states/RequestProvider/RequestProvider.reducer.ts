@@ -1,5 +1,11 @@
 import { RequestAction, RequestState } from "./RequestProvider.model";
 
+/**
+ * @param {RequestState} state - Estado atual do contexto de _requests_.
+ * @param {RequestAction} action - Ação que contém um tipo e um _payload_
+ * o qual deverá alterar o estado atual.
+ * @returns {RequestState} Novo estado após as alterações.
+ */
 const requestReducer = (state: RequestState, action: RequestAction): RequestState => {
   switch (action?.type) {
     case "SET_LOADING":

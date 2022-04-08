@@ -12,6 +12,11 @@ export const RequestContext = createContext<RequestContextValue>({
   requestDispatch: () => {}
 });
 
+/**
+ * @param {React.Node} { children } - Sub árvore de componentes a ser encapsulada pelo _RequestProvider_
+ * @returns {React.Context<RequestContextValue>} Provider que irá fonecer o estado referente
+ * ao estado _requisições_ e uma função _dispatch_ para manipular esse estado.
+ */
 const RequestProvider: FC = ({ children }) => {
   const [requestState, requestDispatch] = useReducer(requestReducer, defaultState);
 
