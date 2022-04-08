@@ -6,30 +6,27 @@ import { Input } from "../Input";
 import { UserContext } from "../../states/UserProvider";
 import { RequestContext } from "../../states/RequestProvider";
 import { RequestResult } from "../RequestResult";
+import useRequest from "../../hooks/useRequest";
 
 export const Login = () => {
   const [login, setLogin] = useState("");
   const [senha, setSenha] = useState("");
   const navigate = useNavigate();
+  const executeRequest = useRequest();
   const { userDispatch } = useContext(UserContext);
-  const { requestState, requestDispatch } = useContext(RequestContext);
+  const { requestState } = useContext(RequestContext);
+
+  const request = () => {
+    return authenticate(login, senha).then((tokenData) => {
+      userDispatch({ type: "SET_TOKEN_DATA", payload: tokenData });
+      navigate("/artigos");
+    });
+  };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    requestDispatch({ type: "SET_DEFAULT" });
-    requestDispatch({ type: "SET_LOADING", payload: true });
-
-    authenticate(login, senha)
-      .then((tokenData) => {
-        userDispatch({ type: "SET_TOKEN_DATA", payload: tokenData });
-
-        navigate("/artigos");
-      })
-      .catch((error) =>
-        requestDispatch({ type: "SET_ERROR", payload: { hasError: true, message: error.message } })
-      )
-      .finally(() => requestDispatch({ type: "SET_LOADING", payload: false }));
+    executeRequest(request);
   };
 
   const getHandleChange = (setValue: Dispatch<SetStateAction<string>>) => {

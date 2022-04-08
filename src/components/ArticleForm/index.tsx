@@ -16,12 +16,10 @@ export const ArticleForm: FC<ComponentProps> = ({ article, onSubmit }) => {
   const [error, setError] = useState({ message: "", hasError: false });
 
   useEffect(() => {
-    if (article) {
-      setTitulo(article.titulo);
-      setConteudo(article.conteudo as string);
-      setResumo(article.resumo);
-      setImagem(article.imagem);
-    }
+    setTitulo(article?.titulo || "");
+    setConteudo(article?.conteudo || "");
+    setResumo(article?.resumo || "");
+    setImagem(article?.imagem || "");
   }, [article]);
 
   const getHandleChange = (setValue: Dispatch<SetStateAction<string>>) => {
