@@ -21,6 +21,7 @@ interface Author {
 interface TokenData {
   userId: number;
   token: string;
+  userName: string;
 }
 
 interface RequestError {
