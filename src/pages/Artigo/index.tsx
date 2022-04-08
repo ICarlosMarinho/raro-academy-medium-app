@@ -1,40 +1,28 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, FC } from "react";
 import { useParams } from "react-router-dom";
 import { ArticleView } from "../../components/ArticleView";
-import { Message } from "../../components/Message";
+import { RequestResult } from "../../components/RequestResult";
+import useRequest from "../../hooks/useRequest";
 import { getArticle } from "../../services";
 
-export const ArtigoPage = () => {
+export const ArtigoPage: FC = () => {
   const [article, setArticle] = useState<Article | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<RequestError>({ message: "", hasError: false });
+  const executeRequests = useRequest();
   const { id } = useParams();
+
+  const request = () => {
+    return getArticle(parseInt(id as string)).then((article) => setArticle(article));
+  };
 
   useEffect(() => {
     if (id) {
-      getArticle(parseInt(id))
-        .then((result) => setArticle(result))
-        .catch((error) => setError({ message: error.message, hasError: true }))
-        .finally(() => setLoading(false));
+      executeRequests(request);
     }
   }, []);
 
-  const renderArticleView = () => {
-    return !article && loading ? (
-      <Message variant="info">Carregando...</Message>
-    ) : (
-      article && <ArticleView article={article} />
-    );
-  };
-
-  const renderError = () => {
-    return error.hasError ? <Message variant="error">{error.message}</Message> : null;
-  };
-
   return (
     <div className="m-10">
-      {renderArticleView()}
-      {renderError()}
+      <RequestResult>{!!article && <ArticleView article={article} />}</RequestResult>
     </div>
   );
 };

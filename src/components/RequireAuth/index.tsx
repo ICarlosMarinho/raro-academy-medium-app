@@ -1,13 +1,9 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useContext } from "react";
 import { Outlet, Navigate } from "react-router-dom";
-import { getTokenDataFromStorage } from "../../helpers";
+import { UserContext } from "../../states/UserProvider";
 
 export const RequireAuth: FC = () => {
-  const [authenticated, setAuthenticated] = useState(true);
+  const { userState } = useContext(UserContext);
 
-  useEffect(() => {
-    setAuthenticated(getTokenDataFromStorage() !== null);
-  }, []);
-
-  return authenticated ? <Outlet /> : <Navigate to="/" replace />;
+  return userState.tokenData ? <Outlet /> : <Navigate to="/" replace />;
 };

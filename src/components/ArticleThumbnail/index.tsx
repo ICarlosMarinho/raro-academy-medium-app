@@ -1,16 +1,29 @@
-import React, { FC, useState } from "react";
+import { FC, useContext, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { formataData } from "../../helpers/";
-import { deleteArticle, getMyArticles } from "../../services";
-import { Message } from "../Message";
+import useRequest from "../../hooks/useRequest";
+import { deleteArticle, getArticles } from "../../services";
+import { ArticlesContext } from "../../states/ArticlesProvider";
+import { RequestContext } from "../../states/RequestProvider";
+import { UserContext } from "../../states/UserProvider";
 import { ComponentProps } from "./ArticleThumbnail.model";
 
-export const ArticleThumbnail: FC<ComponentProps> = ({ article, setArticles }) => {
+export const ArticleThumbnail: FC<ComponentProps> = ({ article }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [deleteClicked, setDeleteClicked] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<RequestError>({ message: "", hasError: false });
+  const { requestState } = useContext(RequestContext);
+  const { articlesDispatch } = useContext(ArticlesContext);
+  const { userState } = useContext(UserContext);
+  const executeRequest = useRequest();
+
+  const requests = () => {
+    return deleteArticle(article.id, userState.tokenData).then(() => {
+      return getArticles(userState.tokenData).then((result) => {
+        articlesDispatch({ type: "SET_ARTICLES", payload: result });
+      });
+    });
+  };
 
   const getHandleClick = (edit: boolean = false) => {
     return () => {
@@ -23,24 +36,12 @@ export const ArticleThumbnail: FC<ComponentProps> = ({ article, setArticles }) =
       setDeleteClicked(true);
     } else {
       setDeleteClicked(false);
-      setLoading(true);
-      setError({ message: "", hasError: false });
 
-      deleteArticle(article.id)
-        .then(() => {
-          return getMyArticles().then((result) => {
-            setArticles(result);
-            setLoading(false);
-          });
-        })
-        .catch((err) => {
-          setError({ message: err.message, hasError: true });
-          setLoading(false);
-        });
+      executeRequest(requests);
     }
   };
 
-  const renderEditButton = () => {
+  const renderButtons = () => {
     return location.pathname === "/artigos" ? (
       <>
         <button
@@ -53,7 +54,7 @@ export const ArticleThumbnail: FC<ComponentProps> = ({ article, setArticles }) =
           Editar
         </button>
         <button
-          disabled={loading}
+          disabled={requestState.loading}
           onClick={handleDeleteClick}
           className={`
             ${deleteClicked ? "bg-red-400" : "bg-red-300"} text-white
@@ -66,18 +67,15 @@ export const ArticleThumbnail: FC<ComponentProps> = ({ article, setArticles }) =
     ) : null;
   };
 
-  const renderError = () => {
-    return error.hasError ? <Message variant="error">{error.message}</Message> : null;
-  };
-
-  const renderLoading = () => {
-    return loading ? <Message variant="info">Carregando...</Message> : null;
-  };
-
   return (
     <div className="flex flex-col w-2/3 mt-5">
       <header className="flex flex-row gap-3 items-center hover:cursor-pointer" onClick={getHandleClick()}>
-        <img src={article.autor.avatar} className="rounded-full" style={{ width: "30px", height: "30px" }} />
+        <img
+          src={article.autor.avatar}
+          alt={`Avatar de ${article.autor.avatar}`}
+          className="rounded-full"
+          style={{ width: "30px", height: "30px" }}
+        />
         <div>{article.autor.nome}</div>
         <div className="text-sm text-gray-500">{formataData(article.dataPublicacao)}</div>
       </header>
@@ -94,10 +92,8 @@ export const ArticleThumbnail: FC<ComponentProps> = ({ article, setArticles }) =
         <div className="text-gray-500 text-xs my-1 hover:cursor-pointer" onClick={getHandleClick()}>
           {article.tempoDeLeitura ? `${article.tempoDeLeitura} de leitura` : ""}
         </div>
-        {renderEditButton()}
+        {renderButtons()}
       </footer>
-      {renderError()}
-      {renderLoading()}
       <hr className="mt-5" />
     </div>
   );

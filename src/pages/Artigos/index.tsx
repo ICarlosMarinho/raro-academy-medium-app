@@ -1,36 +1,39 @@
-import { useEffect, useState } from "react";
+import { FC, useContext, useEffect } from "react";
+import { useMatch } from "react-router-dom";
 import { ArticleList } from "../../components/ArticleList";
-import { Message } from "../../components/Message";
+import { RequestResult } from "../../components/RequestResult";
+import useRequest from "../../hooks/useRequest";
 import { getArticles } from "../../services";
+import { ArticlesContext } from "../../states/ArticlesProvider";
+import { RequestContext } from "../../states/RequestProvider";
+import { UserContext } from "../../states/UserProvider";
 
-export const ArtigosPage = () => {
-  const [articles, setArticles] = useState<Article[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<RequestError>({ message: "", hasError: false });
+export const ArtigosPage: FC = () => {
+  const { articlesDispatch } = useContext(ArticlesContext);
+  const { requestState } = useContext(RequestContext);
+  const executeRequest = useRequest();
+  const { userState } = useContext(UserContext);
+  const match = useMatch("/artigos");
 
-  useEffect(() => {
-    getArticles()
-      .then((result) => setArticles(result))
-      .catch((error) => setError({ message: error.message, hasError: true }))
-      .finally(() => setLoading(false));
-  }, []);
-
-  const renderAticles = () => {
-    return loading ? (
-      <Message variant="info">Carregando...</Message>
-    ) : (
-      !error.hasError && <ArticleList articles={articles} setArticles={setArticles} />
+  const request = () => {
+    return getArticles(match ? userState.tokenData : null).then((result) =>
+      articlesDispatch({ type: "SET_ARTICLES", payload: result })
     );
   };
 
-  const renderError = () => {
-    return error.hasError ? <Message variant="error">{error.message}</Message> : null;
+  useEffect(() => {
+    executeRequest(request);
+
+    return resetArticles;
+  }, []);
+
+  const resetArticles = () => {
+    articlesDispatch({ type: "SET_DEFAULT" });
   };
 
   return (
     <div className="my-30">
-      {renderAticles()}
-      {renderError()}
+      <RequestResult>{!requestState.loading && <ArticleList />}</RequestResult>
     </div>
   );
 };

@@ -1,43 +1,38 @@
-import { ChangeEvent, Dispatch, FormEvent, SetStateAction, useEffect, useState } from "react";
+import { ChangeEvent, Dispatch, FormEvent, SetStateAction, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { authenticate } from "../../services";
 import { Button } from "../Button";
 import { Input } from "../Input";
-import { setTokenDataToStorage } from "../../helpers";
-import { Message } from "../Message";
+import { UserContext } from "../../states/UserProvider";
+import { RequestContext } from "../../states/RequestProvider";
+import { RequestResult } from "../RequestResult";
+import useRequest from "../../hooks/useRequest";
 
 export const Login = () => {
   const [login, setLogin] = useState("");
   const [senha, setSenha] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [requestError, setRequestError] = useState<RequestError>({ hasError: false, message: "" });
   const navigate = useNavigate();
+  const executeRequest = useRequest();
+  const { userDispatch } = useContext(UserContext);
+  const { requestState } = useContext(RequestContext);
+
+  const request = () => {
+    return authenticate(login, senha).then((tokenData) => {
+      userDispatch({ type: "SET_TOKEN_DATA", payload: tokenData });
+      navigate("/artigos");
+    });
+  };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setLoading(true);
-    setRequestError({ hasError: false, message: "" });
 
-    authenticate(login, senha)
-      .then((tokenData) => {
-        setTokenDataToStorage(tokenData);
-        setLoading(false);
-        navigate("/artigos");
-      })
-      .catch((error) => {
-        setLoading(false);
-        setRequestError({ hasError: true, message: error.message });
-      });
+    executeRequest(request);
   };
 
   const getHandleChange = (setValue: Dispatch<SetStateAction<string>>) => {
     return (event: ChangeEvent<HTMLInputElement>) => {
       setValue(event.target.value);
     };
-  };
-
-  const renderError = () => {
-    return requestError.hasError ? <Message variant="error">{requestError.message}</Message> : null;
   };
 
   return (
@@ -50,39 +45,40 @@ export const Login = () => {
             alt="Workflow"
           />
         </div>
-        <form className="mt-8 space-y-6" action="#" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div className="mt-5">
-              <Input
-                type="text"
-                id="login"
-                label="Login"
-                placeholder="login"
-                required
-                value={login}
-                onChange={getHandleChange(setLogin)}
-              />
-            </div>
+        <RequestResult>
+          <form className="mt-8 space-y-6" action="#" onSubmit={handleSubmit}>
+            <div className="rounded-md shadow-sm -space-y-px">
+              <div className="mt-5">
+                <Input
+                  type="text"
+                  id="login"
+                  label="Login"
+                  placeholder="login"
+                  required
+                  value={login}
+                  onChange={getHandleChange(setLogin)}
+                />
+              </div>
 
-            <div className="mt-5">
-              <Input
-                type="password"
-                id="senha"
-                label="senha"
-                placeholder="&bull;&bull;&bull;&bull;&bull;&bull;"
-                required
-                value={senha}
-                onChange={getHandleChange(setSenha)}
-              />
+              <div className="mt-5">
+                <Input
+                  type="password"
+                  id="senha"
+                  label="senha"
+                  placeholder="&bull;&bull;&bull;&bull;&bull;&bull;"
+                  required
+                  value={senha}
+                  onChange={getHandleChange(setSenha)}
+                />
+              </div>
             </div>
-          </div>
-          <div>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Carregando..." : "Entrar"}
-            </Button>
-          </div>
-          {renderError()}
-        </form>
+            <div>
+              <Button type="submit" disabled={requestState.loading}>
+                Entrar
+              </Button>
+            </div>
+          </form>
+        </RequestResult>
       </div>
     </div>
   );

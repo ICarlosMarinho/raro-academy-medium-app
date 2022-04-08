@@ -1,17 +1,26 @@
-import { Dispatch, FC, FormEvent, SetStateAction, useState } from "react";
+import { Dispatch, FC, FormEvent, SetStateAction, useContext, useEffect, useState } from "react";
 import { Button } from "../Button";
 import { Input } from "../Input";
 import { RitchTextEditor } from "../RitchTextEditor";
 import { ComponentProps } from "./ArticleForm.model";
 import { getBase64 } from "../../helpers";
 import { Message } from "../Message";
+import { RequestContext } from "../../states/RequestProvider";
 
-export const ArticleForm: FC<ComponentProps> = ({ article, onSubmit, loading }) => {
-  const [titulo, setTitulo] = useState(article?.titulo || "");
-  const [conteudo, setConteudo] = useState(article?.conteudo || "");
-  const [resumo, setResumo] = useState(article?.resumo || "");
-  const [imagem, setImagem] = useState(article?.imagem || "");
-  const [error, setError] = useState<RequestError>({ message: "", hasError: false });
+export const ArticleForm: FC<ComponentProps> = ({ article, onSubmit }) => {
+  const { requestState } = useContext(RequestContext);
+  const [titulo, setTitulo] = useState("");
+  const [conteudo, setConteudo] = useState("");
+  const [resumo, setResumo] = useState("");
+  const [imagem, setImagem] = useState("");
+  const [error, setError] = useState({ message: "", hasError: false });
+
+  useEffect(() => {
+    setTitulo(article?.titulo || "");
+    setConteudo(article?.conteudo || "");
+    setResumo(article?.resumo || "");
+    setImagem(article?.imagem || "");
+  }, [article]);
 
   const getHandleChange = (setValue: Dispatch<SetStateAction<string>>) => {
     return (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,8 +88,8 @@ export const ArticleForm: FC<ComponentProps> = ({ article, onSubmit, loading }) 
 
           <RitchTextEditor label="Conteúdo" id="conteudo" value={conteudo} onChange={setConteudo} />
 
-          <Button type="submit" disabled={loading}>
-            {loading ? "Carregando..." : "Salvar"}
+          <Button type="submit" disabled={requestState.loading}>
+            Salvar
           </Button>
           {renderError()}
         </form>

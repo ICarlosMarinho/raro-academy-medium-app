@@ -1,3 +1,3 @@
 export interface ComponentProps {
-  article: Article;
+  type: "button" | "link";
 }
